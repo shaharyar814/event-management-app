@@ -36,27 +36,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) {
                 console.error('Error fetching profile:', error);
+                // Don't return early - still set loading to false
+                setProfile(null);
                 return;
             }
 
             setProfile(data);
         } catch (error) {
             console.error('Error fetching profile:', error);
+            setProfile(null);
         }
     }, [supabase]);
 
     useEffect(() => {
+        let isMounted = true;
+
+        // Set a timeout to ensure loading state doesn't get stuck
+        const loadingTimeout = setTimeout(() => {
+            if (isMounted) {
+                console.warn('Auth loading timeout - forcing loading to false');
+                setLoading(false);
+            }
+        }, 5000); // 5 second timeout
+
         // Get initial session
         const getInitialSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setSession(session);
-            setUser(session?.user ?? null);
+            try {
+                console.log('Getting initial session...');
 
-            if (session?.user) {
-                await fetchProfile(session.user.id);
+                // Check if Supabase is properly configured
+                if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+                    console.error('Supabase environment variables not configured');
+                    if (isMounted) {
+                        setLoading(false);
+                        clearTimeout(loadingTimeout);
+                    }
+                    return;
+                }
+
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error('Error getting session:', error);
+                }
+
+                if (isMounted) {
+                    setSession(session);
+                    setUser(session?.user ?? null);
+
+                    if (session?.user) {
+                        console.log('User found, fetching profile...');
+                        await fetchProfile(session.user.id);
+                    } else {
+                        console.log('No user found');
+                    }
+
+                    setLoading(false);
+                    clearTimeout(loadingTimeout);
+                }
+            } catch (error) {
+                console.error('Error getting initial session:', error);
+                if (isMounted) {
+                    setLoading(false);
+                    clearTimeout(loadingTimeout);
+                }
             }
-
-            setLoading(false);
         };
 
         getInitialSession();
@@ -64,20 +108,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                setSession(session);
-                setUser(session?.user ?? null);
+                console.log('Auth state changed:', event, session?.user?.id);
+                try {
+                    if (isMounted) {
+                        setSession(session);
+                        setUser(session?.user ?? null);
 
-                if (session?.user) {
-                    await fetchProfile(session.user.id);
-                } else {
-                    setProfile(null);
+                        if (session?.user) {
+                            await fetchProfile(session.user.id);
+                        } else {
+                            setProfile(null);
+                        }
+
+                        setLoading(false);
+                        clearTimeout(loadingTimeout);
+                    }
+                } catch (error) {
+                    console.error('Error in auth state change:', error);
+                    if (isMounted) {
+                        setLoading(false);
+                        clearTimeout(loadingTimeout);
+                    }
                 }
-
-                setLoading(false);
             }
         );
 
-        return () => subscription.unsubscribe();
+        return () => {
+            isMounted = false;
+            subscription.unsubscribe();
+            clearTimeout(loadingTimeout);
+        };
     }, [supabase.auth, fetchProfile]);
 
     const signIn = async (email: string, password: string) => {

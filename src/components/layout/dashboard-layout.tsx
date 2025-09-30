@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { AuthLoading } from "@/components/auth/auth-loading";
 import { Header } from "./header";
@@ -12,9 +13,16 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { loading } = useAuth();
+    const { loading, user } = useAuth();
+    const router = useRouter();
 
     if (loading) {
+        return <AuthLoading />;
+    }
+
+    // If not loading but no user, redirect to login
+    if (!user) {
+        router.push('/auth/login');
         return <AuthLoading />;
     }
 

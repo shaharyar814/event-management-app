@@ -13,6 +13,9 @@ export function AuthLoading() {
                     <div className="h-4 w-32 bg-muted animate-pulse rounded mx-auto" />
                     <div className="h-3 w-24 bg-muted/60 animate-pulse rounded mx-auto" />
                 </div>
+                <p className="text-sm text-muted-foreground mt-4">
+                    Loading your dashboard...
+                </p>
             </div>
         </div>
     );
