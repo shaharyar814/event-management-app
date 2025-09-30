@@ -128,11 +128,11 @@ export default function CreateEventPage() {
             setTags([]);
             setUploadedImage(null);
 
-            // Navigate to events page or the created event
+            // Navigate to events page
             router.push('/events');
         } catch (error) {
             console.error("Error creating event:", error);
-            toast.error("Failed to create event. Please try again.");
+            toast.error(`Failed to create event: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsLoading(false);
         }
@@ -547,6 +547,7 @@ export default function CreateEventPage() {
                                                     };
 
                                                     await eventsService.createEvent(eventData);
+
                                                     toast.success("Event published successfully!");
                                                     form.reset();
                                                     setTags([]);
@@ -554,7 +555,7 @@ export default function CreateEventPage() {
                                                     router.push('/events');
                                                 } catch (error) {
                                                     console.error("Error publishing event:", error);
-                                                    toast.error("Failed to publish event. Please try again.");
+                                                    toast.error(`Failed to publish event: ${error instanceof Error ? error.message : 'Unknown error'}`);
                                                 } finally {
                                                     setIsLoading(false);
                                                 }

@@ -68,11 +68,12 @@ export default function EventsPage() {
                     category: selectedCategory === "all" ? undefined : selectedCategory,
                     search: searchQuery || undefined,
                 });
-                setEvents(result.events);
+
+                setEvents(result.events || []);
             } catch (err) {
                 console.error("Error fetching events:", err);
-                setError("Failed to load events. Please try again.");
-                toast.error("Failed to load events");
+                setError(`Failed to load events: ${err instanceof Error ? err.message : 'Unknown error'}`);
+                toast.error(`Failed to load events: ${err instanceof Error ? err.message : 'Unknown error'}`);
             } finally {
                 setLoading(false);
             }
@@ -238,7 +239,7 @@ export default function EventsPage() {
                                     className="pl-9"
                                 />
                             </div>
-                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                            <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as EventCategory | "all")}>
                                 <SelectTrigger className="w-full md:w-[180px]">
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
@@ -250,7 +251,7 @@ export default function EventsPage() {
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                            <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as EventStatus | "all")}>
                                 <SelectTrigger className="w-full md:w-[180px]">
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>

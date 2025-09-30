@@ -24,20 +24,15 @@ export class EventsService {
 
         let query = this.supabase
             .from('events')
-            .select(`
-        *,
-        event_analytics (
-          views,
-          registrations,
-          attendees,
-          rating
-        )
-      `)
+            .select('*')
             .order('created_at', { ascending: false });
 
         // Apply filters
         if (status && status !== 'all') {
             query = query.eq('status', status);
+        } else if (status === 'all') {
+            // For 'all' status, we need to get both published events and user's own events
+            // This is handled by RLS policies, so we don't need to filter here
         }
 
         if (category && category !== 'all') {
@@ -60,6 +55,7 @@ export class EventsService {
         const { data, error, count } = await query;
 
         if (error) {
+            console.error('Error fetching events:', error);
             throw new Error(`Failed to fetch events: ${error.message}`);
         }
 
