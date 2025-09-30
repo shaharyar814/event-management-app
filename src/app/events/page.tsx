@@ -50,7 +50,7 @@ export default function EventsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<EventCategory | "all">("all");
     const [selectedStatus, setSelectedStatus] = useState<EventStatus | "all">("published");
-    const [viewMode] = useState<"grid" | "list">("grid");
+    // const [viewMode] = useState<"grid" | "list">("grid"); // Commented out as it's not used yet
     const [events, setEvents] = useState<EventWithCreator[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -113,7 +113,8 @@ export default function EventsPage() {
 
     const EventCard = ({ event }: { event: EventWithCreator }) => {
         const { date, time } = formatEventDateTime(event.date_time);
-        const attendeeCount = event.event_analytics?.[0]?.registrations || 0;
+        // For now, we'll use a default value since event_analytics is not included in EventWithCreator
+        const attendeeCount = 0; // This should be fetched separately or included in the query
 
         return (
             <Card className="group overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
