@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth/auth-context";
 import { eventsService } from "@/lib/services/events";
 import { EventWithCreator, EventStatus, EventCategory } from "@/lib/supabase/types";
+import Image from "next/image";
 
 const categories: (EventCategory | "all")[] = ["all", "conference", "workshop", "summit", "networking", "launch", "seminar", "training", "webinar"];
 const statuses: (EventStatus | "all")[] = ["all", "draft", "published", "cancelled", "completed"];
@@ -49,11 +50,11 @@ export default function EventsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<EventCategory | "all">("all");
     const [selectedStatus, setSelectedStatus] = useState<EventStatus | "all">("published");
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [viewMode] = useState<"grid" | "list">("grid");
     const [events, setEvents] = useState<EventWithCreator[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { user, loading: authLoading } = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
 
     // Fetch events
@@ -118,9 +119,11 @@ export default function EventsPage() {
             <Card className="group overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
                 <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                     {event.image_url ? (
-                        <img
+                        <Image
                             src={event.image_url}
                             alt={event.title}
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                         />
                     ) : (

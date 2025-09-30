@@ -128,7 +128,7 @@ export default function DashboardPage() {
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                         <p className="text-muted-foreground">
-                            Welcome back! Here's what's happening with your events.
+                            Welcome back! Here&apos;s what&apos;s happening with your events.
                         </p>
                     </div>
                     <Button className="animate-scale-in">
@@ -226,11 +226,11 @@ export default function DashboardPage() {
                     <div className="space-y-6">
                         <Card className="animate-slide-up" style={{ animationDelay: "500ms" }}>
                             <CardHeader>
-                                <CardTitle>Today's Schedule</CardTitle>
+                                <CardTitle>Today&apos;s Schedule</CardTitle>
                                 <CardDescription>Your events for today</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {upcomingEvents.map((event, index) => (
+                                {upcomingEvents.map((event) => (
                                     <div key={event.id} className="flex items-center space-x-3">
                                         <div className="h-2 w-2 rounded-full bg-primary" />
                                         <div className="flex-1 space-y-1">

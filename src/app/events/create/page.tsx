@@ -33,7 +33,6 @@ import {
     Calendar,
     Clock,
     MapPin,
-    Users,
     Image as ImageIcon,
     Save,
     Eye,
@@ -45,6 +44,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth/auth-context";
 import { eventsService } from "@/lib/services/events";
 import { EventCategory } from "@/lib/supabase/types";
+import Image from "next/image";
 
 const eventSchema = z.object({
     title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
@@ -119,7 +119,7 @@ export default function CreateEventPage() {
                 status: 'draft' as const, // Start as draft
             };
 
-            const createdEvent = await eventsService.createEvent(eventData);
+            await eventsService.createEvent(eventData);
 
             toast.success("Event created successfully!");
 
@@ -450,9 +450,11 @@ export default function CreateEventPage() {
                                         <div className="space-y-4">
                                             {uploadedImage ? (
                                                 <div className="relative">
-                                                    <img
+                                                    <Image
                                                         src={uploadedImage}
                                                         alt="Event preview"
+                                                        width={400}
+                                                        height={192}
                                                         className="w-full h-48 object-cover rounded-lg"
                                                     />
                                                     <Button

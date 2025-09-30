@@ -3,10 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
-    // Enable server components logging in development
-    logging: {
-      level: 'verbose',
-    },
+    // Note: logging option removed as it's not supported in Next.js 15.5.4
   },
 
   // Image optimization
@@ -87,8 +84,7 @@ const nextConfig: NextConfig = {
   // Output configuration for Vercel
   output: 'standalone',
 
-  // Enable SWC minification
-  swcMinify: true,
+  // Note: swcMinify is deprecated in Next.js 15+ and enabled by default
 
   // Webpack configuration
   webpack: (config, { dev, isServer }) => {

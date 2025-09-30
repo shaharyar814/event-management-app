@@ -195,7 +195,7 @@ export default function AnalyticsPage() {
 
                                     <TabsContent value="events" className="space-y-4">
                                         <div className="h-[300px] flex items-end justify-between space-x-2 p-4 bg-muted/30 rounded-lg">
-                                            {monthlyData.map((data, index) => (
+                                            {monthlyData.map((data) => (
                                                 <div key={data.month} className="flex flex-col items-center space-y-2">
                                                     <div
                                                         className="bg-primary rounded-t-sm transition-all hover:bg-primary/80"
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
 
                                     <TabsContent value="attendees" className="space-y-4">
                                         <div className="h-[300px] flex items-end justify-between space-x-2 p-4 bg-muted/30 rounded-lg">
-                                            {monthlyData.map((data, index) => (
+                                            {monthlyData.map((data) => (
                                                 <div key={data.month} className="flex flex-col items-center space-y-2">
                                                     <div
                                                         className="bg-blue-500 rounded-t-sm transition-all hover:bg-blue-400"
@@ -231,7 +231,7 @@ export default function AnalyticsPage() {
 
                                     <TabsContent value="revenue" className="space-y-4">
                                         <div className="h-[300px] flex items-end justify-between space-x-2 p-4 bg-muted/30 rounded-lg">
-                                            {monthlyData.map((data, index) => (
+                                            {monthlyData.map((data) => (
                                                 <div key={data.month} className="flex flex-col items-center space-y-2">
                                                     <div
                                                         className="bg-green-500 rounded-t-sm transition-all hover:bg-green-400"
