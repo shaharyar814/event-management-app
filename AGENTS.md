@@ -32,6 +32,9 @@ Without valid Supabase credentials, the app will render UI pages but all Supabas
 
 `npm run build` succeeds despite lint/type errors because `next.config.ts` sets `eslint.ignoreDuringBuilds: true` and `typescript.ignoreBuildErrors: true`.
 
-### Key gotcha
+### Key gotchas
 
-The `supabase` singleton export in `src/lib/supabase/client.ts` is an IIFE that throws immediately if `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` are not set. Always ensure `.env.local` exists with at least placeholder values before starting the dev server.
+- The `supabase` singleton export in `src/lib/supabase/client.ts` is an IIFE that throws immediately if `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` are not set. Always ensure `.env.local` exists with at least placeholder values before starting the dev server.
+- `NEXT_PUBLIC_` env vars are inlined at compile time by Turbopack. After changing `.env.local`, you must fully restart the dev server (kill the process and run `npm run dev` again). A stale `.next` cache from a previous run with different env vars can cause 500 errors — delete `.next` if this happens.
+- Supabase requires email confirmation by default. To create a test user and bypass email confirmation, use the admin API: `PUT /auth/v1/admin/users/{id}` with `{"email_confirm":true}` and `Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY`.
+- The database schema (`src/lib/supabase/schema.sql` and `functions.sql`) must be run against your Supabase project before database-dependent features (events, profiles) will work. Auth works independently of the schema.
