@@ -24,7 +24,7 @@ A modern, beautiful event management web application built with Next.js 15, Type
 
 ### 📱 Pages Implemented
 
-1. **Landing Page** (`/`) - Welcome screen with auto-redirect to dashboard
+1. **Root Route** (`/`) - Redirects to `/dashboard` (configured in `next.config.ts`)
 2. **Dashboard** (`/dashboard`) - Overview with stats, recent events, and quick actions
 3. **Events Listing** (`/events`) - Comprehensive event management with filters
 4. **Create Event** (`/events/create`) - Beautiful form with validation
@@ -120,7 +120,8 @@ npm install
 
 1. In Supabase Dashboard → Authentication → Settings
 2. Set Site URL to `http://localhost:3000`
-3. Add redirect URL: `http://localhost:3000/auth/callback`
+3. Redirect URLs are optional for this app's current auth flow (email/password).  
+   Only add callback URLs if you introduce OAuth or magic-link flows.
 
 ### 5. Start Development Server
 
@@ -157,6 +158,10 @@ npm run dev
 
 Routes such as `/dashboard`, `/events`, `/analytics`, `/profile`, and `/settings` are protected by middleware and redirect unauthenticated users to `/auth/login`.
 
+### Supabase email links redirect to a missing callback page
+
+This repository currently has no `/auth/callback` route. Current auth UI uses `signInWithPassword` and `signUp` from `src/lib/auth/auth-context.tsx`, so callback routes are not required unless you add OAuth/magic-link auth.
+
 ### Build succeeds but lint/type-check shows errors
 
 `npm run lint` and `npm run type-check` currently surface known pre-existing issues, while production builds still pass because `next.config.ts` sets:
@@ -164,22 +169,45 @@ Routes such as `/dashboard`, `/events`, `/analytics`, `/profile`, and `/settings
 - `eslint.ignoreDuringBuilds: true`
 - `typescript.ignoreBuildErrors: true`
 
+## 🔐 Auth & Route Protection Workflow
+
+### What is implemented today
+
+- `src/lib/auth/auth-context.tsx`
+  - `signIn` uses `supabase.auth.signInWithPassword`
+  - `signUp` uses `supabase.auth.signUp` with user metadata
+  - auth state is tracked via `onAuthStateChange`
+- `src/middleware.ts`
+  - protects `/dashboard`, `/events`, `/analytics`, `/profile`, `/settings`
+  - redirects unauthenticated requests to `/auth/login`
+  - redirects authenticated users away from `/auth/*` to `/dashboard`
+
+### Practical implications
+
+- Email/password works without an auth callback route.
+- If you add OAuth or magic-link auth later, add an explicit callback route and update Supabase redirect URLs.
+
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── dashboard/         # Dashboard page
-│   ├── events/           # Events listing and creation
-│   ├── analytics/        # Analytics dashboard
-│   ├── globals.css       # Global styles and animations
-│   └── layout.tsx        # Root layout with theme provider
+├── app/                         # Next.js App Router pages
+│   ├── auth/                    # Login/register pages
+│   ├── dashboard/               # Dashboard page
+│   ├── events/                  # Events listing + create flows
+│   ├── analytics/               # Analytics page
+│   ├── globals.css
+│   └── layout.tsx               # Root providers (theme + auth)
 ├── components/
-│   ├── ui/               # Shadcn/ui components
-│   ├── layout/           # Layout components (header, sidebar)
-│   └── theme-provider.tsx # Theme switching logic
-└── lib/
-    └── utils.ts          # Utility functions
+│   ├── auth/                    # Auth loading UI
+│   ├── layout/                  # Header/sidebar/dashboard layout
+│   ├── theme-provider.tsx
+│   └── ui/                      # Shadcn/ui components
+├── lib/
+│   ├── auth/auth-context.tsx    # Client auth state + actions
+│   ├── services/                # Supabase-backed data services
+│   └── supabase/                # Supabase client/server + SQL schema
+└── middleware.ts                # Route protection + auth redirects
 ```
 
 ## 🎨 Design Highlights

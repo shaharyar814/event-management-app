@@ -67,9 +67,17 @@ This will create:
 2. Configure your **Site URL**:
    - For development: `http://localhost:3000`
    - For production: `https://your-domain.com`
-3. Add **Redirect URLs**:
-   - `http://localhost:3000/auth/callback` (development)
-   - `https://your-domain.com/auth/callback` (production)
+3. Redirect URLs are optional for the current implementation in this repo.
+   - The app currently uses email/password (`signInWithPassword`, `signUp`) in `src/lib/auth/auth-context.tsx`.
+   - There is no `/auth/callback` route in `src/app` right now.
+   - Add callback URLs only if you introduce OAuth or magic-link flows.
+
+### Current auth behavior in code
+
+- Login page: `src/app/auth/login/page.tsx`
+- Register page: `src/app/auth/register/page.tsx`
+- Client auth state: `src/lib/auth/auth-context.tsx`
+- Route protection: `src/middleware.ts` (redirects unauthenticated users from protected routes to `/auth/login`)
 
 ## 6. Enable Email Authentication
 
@@ -140,7 +148,9 @@ When deploying to production:
 1. **"Invalid API key"**: Check your environment variables
 2. **"Row Level Security policy violation"**: Check RLS policies
 3. **"Email not confirmed"**: Check email confirmation settings
-4. **"Redirect URL mismatch"**: Update redirect URLs in Supabase
+4. **"Redirect URL mismatch"**:
+   - Usually relevant for OAuth/magic-link setups.
+   - For this repo's default email/password flow, verify Site URL first.
 5. **"Missing Supabase environment variables"**:
    - Ensure `.env.local` exists and has `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
    - Restart `npm run dev` after changes.
@@ -151,6 +161,9 @@ When deploying to production:
    - Ensure both SQL files were executed:
      - `src/lib/supabase/schema.sql`
      - `src/lib/supabase/functions.sql`
+8. **Email confirmation link points to `/auth/callback` and 404s**:
+   - This repo does not include a callback route by default.
+   - Update your Supabase redirect configuration or implement a callback route before enabling callback-based auth flows.
 
 ### Useful SQL Queries
 
