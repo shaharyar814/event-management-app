@@ -129,9 +129,46 @@ The application is configured with:
 The deployment includes:
 
 - **Security Headers**: XSS protection, content type options, frame options
-- **CORS Configuration**: Proper API access control
-- **Environment Validation**: Required variables checked at build time
+- **Route Protection**: Middleware redirects unauthenticated users on protected pages
+- **Environment Requirements**: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` must be set for auth/data flows
 - **Console Removal**: Console logs removed in production
+
+### Critical Framework CVE Response (Runbook)
+
+Use this runbook when a security advisory targets Next.js, React, or React Server Components.
+
+1. **Confirm current framework versions**
+   ```bash
+   npm ls next react react-dom eslint-config-next
+   ```
+2. **Apply patched framework/tooling versions**
+   ```bash
+   npm install next@latest eslint-config-next@latest
+   # If the advisory includes React runtime packages:
+   npm install react@latest react-dom@latest
+   ```
+3. **Reinstall from lockfile (prevents stale local installs)**
+   ```bash
+   npm ci
+   ```
+4. **Validate before deploy**
+   ```bash
+   npm run build
+   npm run lint
+   npm run type-check
+   ```
+5. **Deploy to preview first**
+   - Verify authentication (`/auth/login`, `/auth/register`)
+   - Verify event workflows (`/events`, `/events/create`)
+6. **Promote to production and monitor**
+   - Watch Vercel runtime logs for new server errors
+   - Re-check sign-in and event creation after rollout
+
+**Constraints**
+
+- Do not ship framework security upgrades without committing both `package.json` and `package-lock.json`
+- Keep framework tooling aligned (`next` and `eslint-config-next`) during routine maintenance, and update `react`/`react-dom` together
+- Avoid delaying production rollout after preview validation for critical CVE patches
 
 ## 📊 Performance Optimizations
 
@@ -203,6 +240,12 @@ The deployment includes:
    - Check Site URL in Supabase settings
    - Verify redirect URLs are configured
    - Test with different browsers/incognito
+
+5. **Security Patch Did Not Apply**:
+   - Confirm the committed versions in `package.json`
+   - Verify lockfile updates in `package-lock.json`
+   - Reinstall dependencies after pulling updates: `npm ci`
+   - Run `npm ls next react react-dom eslint-config-next` to confirm installed versions (if this fails with `ELSPROBLEMS`, local modules are out of sync)
 
 ### Debug Commands
 
