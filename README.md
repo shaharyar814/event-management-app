@@ -1,6 +1,6 @@
 # EventHub - Event Management Platform
 
-A modern, beautiful event management web application built with Next.js 14, TypeScript, and Tailwind CSS.
+A modern, beautiful event management web application built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## 🚀 Features
 
@@ -32,7 +32,7 @@ A modern, beautiful event management web application built with Next.js 14, Type
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15.5.9 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: Shadcn/ui + Radix UI
@@ -128,6 +128,32 @@ npm run dev
 Navigate to [http://localhost:3000](http://localhost:3000)
 
 📖 **Detailed Setup Guide**: See `SUPABASE_SETUP.md` for complete instructions.
+
+## 🔐 Framework Security Patch Workflow
+
+Use this workflow when a Next.js or React security advisory is published (for example, React Flight / Server Components CVEs):
+
+1. **Update vulnerable framework packages**
+   ```bash
+   npm install next@latest eslint-config-next@latest
+   ```
+2. **Ensure lockfile is updated in the same commit**
+   - Commit both `package.json` and `package-lock.json`
+3. **Verify installed versions and compatibility**
+   ```bash
+   npm ls next react react-dom eslint-config-next
+   ```
+4. **Run release safety checks**
+   ```bash
+   npm run build && npm run lint && npm run type-check
+   ```
+
+### Common Pitfalls During Security Upgrades
+
+- Updating `package.json` without committing `package-lock.json`
+- Pulling dependency changes without reinstalling (`npm ci` or `npm install`)
+- Skipping `npm run build` after framework updates
+- Running mismatched Next.js toolchain versions for too long (keep `next` and `eslint-config-next` in sync during normal dependency maintenance)
 
 ## 📁 Project Structure
 
