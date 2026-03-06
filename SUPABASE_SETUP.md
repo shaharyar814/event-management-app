@@ -28,13 +28,21 @@ Once your project is created:
 1. Create a `.env.local` file in your project root:
 
 ```bash
+cp env.example .env.local
+```
+
+2. Update `.env.local` with your real project values:
+
+```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 ```
 
-2. Replace the placeholder values with your actual Supabase credentials
+3. Restart the dev server after changing any `NEXT_PUBLIC_*` variable.
+   - Next.js/Turbopack inlines these values at compile time.
+   - If behavior looks stale, clear `.next` and restart.
 
 ## 4. Set Up the Database Schema
 
@@ -87,6 +95,8 @@ To enable social logins (Google, GitHub, etc.):
 4. Check your Supabase dashboard to see if the user was created
 5. Try logging in at `/auth/login`
 
+> Note: protected routes (`/dashboard`, `/events`, `/analytics`, `/profile`, `/settings`) redirect unauthenticated users to `/auth/login` via middleware.
+
 ## 9. Database Policies (Already Configured)
 
 The schema includes these security policies:
@@ -131,6 +141,16 @@ When deploying to production:
 2. **"Row Level Security policy violation"**: Check RLS policies
 3. **"Email not confirmed"**: Check email confirmation settings
 4. **"Redirect URL mismatch"**: Update redirect URLs in Supabase
+5. **"Missing Supabase environment variables"**:
+   - Ensure `.env.local` exists and has `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+   - Restart `npm run dev` after changes.
+6. **"Failed to fetch" or auth/database requests failing locally**:
+   - Verify all three keys are set.
+   - Re-check Supabase project URL/key values from Settings → API.
+7. **Auth works but profiles/events fail**:
+   - Ensure both SQL files were executed:
+     - `src/lib/supabase/schema.sql`
+     - `src/lib/supabase/functions.sql`
 
 ### Useful SQL Queries
 
