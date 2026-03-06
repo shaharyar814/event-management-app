@@ -136,14 +136,20 @@ Use this workflow when a Next.js or React security advisory is published (for ex
 1. **Update vulnerable framework packages**
    ```bash
    npm install next@latest eslint-config-next@latest
+   # If the advisory includes React runtime packages:
+   npm install react@latest react-dom@latest
    ```
 2. **Ensure lockfile is updated in the same commit**
    - Commit both `package.json` and `package-lock.json`
-3. **Verify installed versions and compatibility**
+3. **Reinstall from lockfile to avoid stale local modules**
+   ```bash
+   npm ci
+   ```
+4. **Verify installed versions and compatibility**
    ```bash
    npm ls next react react-dom eslint-config-next
    ```
-4. **Run release safety checks**
+5. **Run release safety checks**
    ```bash
    npm run build && npm run lint && npm run type-check
    ```

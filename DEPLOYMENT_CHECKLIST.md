@@ -31,6 +31,7 @@ Use this checklist to ensure a smooth deployment to Vercel.
 ### Framework Security Maintenance
 
 - [ ] `package.json` and `package-lock.json` updated together for dependency security patches
+- [ ] Fresh install performed after pulling security patch changes (`npm ci`)
 - [ ] `npm ls next react react-dom eslint-config-next` confirms expected framework versions
 - [ ] Critical framework CVE patches validated in a preview deployment before production rollout
 
@@ -47,7 +48,8 @@ Use this checklist to ensure a smooth deployment to Vercel.
 ### Deploy & Test
 
 - [ ] Initial deployment successful
-- [ ] Health check endpoint working (`/api/health`)
+- [ ] Root route redirects as expected (`/` → `/dashboard`)
+- [ ] Unauthenticated access redirects as expected (`/dashboard` → `/auth/login`)
 - [ ] Application loads without errors
 - [ ] All routes accessible
 
@@ -116,7 +118,7 @@ Use this checklist to ensure a smooth deployment to Vercel.
 1. Check Vercel function logs
 2. Verify all environment variables are set
 3. Check for runtime errors in Vercel dashboard
-4. Test health endpoint: `/api/health`
+4. Test route behavior directly: `/`, `/dashboard`, `/auth/login`
 
 ## 📊 Monitoring Setup
 
@@ -156,7 +158,7 @@ Your deployment is successful when:
 - ✅ Events can be created and viewed
 - ✅ All navigation works correctly
 - ✅ No console errors in production
-- ✅ Health check returns healthy status
+- ✅ Route redirect behavior is correct for authenticated vs unauthenticated users
 - ✅ Mobile and desktop views work properly
 
 ## 📞 Support Resources
@@ -169,6 +171,6 @@ Your deployment is successful when:
 ---
 
 **Deployment URL**: `https://your-project.vercel.app`
-**Health Check**: `https://your-project.vercel.app/api/health`
+**Smoke Test Routes**: `/`, `/dashboard`, `/auth/login`, `/events`
 
 **Status**: 🟢 Ready for Production
