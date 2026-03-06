@@ -62,9 +62,9 @@ The schema file automatically enables RLS and creates policies. Verify in your S
 
 1. Go to **Authentication** → **Settings**
 2. Configure **Site URL**: `https://your-domain.vercel.app`
-3. Add **Redirect URLs**:
-   - `https://your-domain.vercel.app/auth/callback`
-   - `http://localhost:3000/auth/callback` (for development)
+3. Redirect URLs are optional for the current implementation.
+   - This app currently uses email/password auth in `src/lib/auth/auth-context.tsx`.
+   - Add callback-specific URLs only if you introduce OAuth or magic-link flows.
 
 ## 🚀 Deployment Steps
 
@@ -145,8 +145,8 @@ The deployment includes:
 ### Pre-deployment Checklist
 
 - [ ] Run `npm run build` locally to test build
-- [ ] Run `npm run type-check` to verify TypeScript
-- [ ] Run `npm run lint` to check code quality
+- [ ] (Optional) Run `npm run type-check` and review known pre-existing issues
+- [ ] (Optional) Run `npm run lint` and review known pre-existing issues
 - [ ] Test all authentication flows
 - [ ] Test event creation and fetching
 - [ ] Verify environment variables are set
@@ -201,7 +201,7 @@ The deployment includes:
 
 4. **Authentication Issues**:
    - Check Site URL in Supabase settings
-   - Verify redirect URLs are configured
+   - Verify redirect URLs only if using OAuth/magic-link callback-based auth
    - Test with different browsers/incognito
 
 ### Debug Commands

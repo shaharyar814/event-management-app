@@ -28,13 +28,21 @@ Once your project is created:
 1. Create a `.env.local` file in your project root:
 
 ```bash
+cp env.example .env.local
+```
+
+2. Update `.env.local` with your real project values:
+
+```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 ```
 
-2. Replace the placeholder values with your actual Supabase credentials
+3. Restart the dev server after changing any `NEXT_PUBLIC_*` variable.
+   - Next.js/Turbopack inlines these values at compile time.
+   - If behavior looks stale, clear `.next` and restart.
 
 ## 4. Set Up the Database Schema
 
@@ -59,9 +67,17 @@ This will create:
 2. Configure your **Site URL**:
    - For development: `http://localhost:3000`
    - For production: `https://your-domain.com`
-3. Add **Redirect URLs**:
-   - `http://localhost:3000/auth/callback` (development)
-   - `https://your-domain.com/auth/callback` (production)
+3. Redirect URLs are optional for the current implementation in this repo.
+   - The app currently uses email/password (`signInWithPassword`, `signUp`) in `src/lib/auth/auth-context.tsx`.
+   - There is no `/auth/callback` route in `src/app` right now.
+   - Add callback URLs only if you introduce OAuth or magic-link flows.
+
+### Current auth behavior in code
+
+- Login page: `src/app/auth/login/page.tsx`
+- Register page: `src/app/auth/register/page.tsx`
+- Client auth state: `src/lib/auth/auth-context.tsx`
+- Route protection: `src/middleware.ts` (redirects unauthenticated users from protected routes to `/auth/login`)
 
 ## 6. Enable Email Authentication
 
@@ -86,6 +102,8 @@ To enable social logins (Google, GitHub, etc.):
 3. Try creating an account at `/auth/register`
 4. Check your Supabase dashboard to see if the user was created
 5. Try logging in at `/auth/login`
+
+> Note: protected routes (`/dashboard`, `/events`, `/analytics`, `/profile`, `/settings`) redirect unauthenticated users to `/auth/login` via middleware.
 
 ## 9. Database Policies (Already Configured)
 
@@ -130,7 +148,22 @@ When deploying to production:
 1. **"Invalid API key"**: Check your environment variables
 2. **"Row Level Security policy violation"**: Check RLS policies
 3. **"Email not confirmed"**: Check email confirmation settings
-4. **"Redirect URL mismatch"**: Update redirect URLs in Supabase
+4. **"Redirect URL mismatch"**:
+   - Usually relevant for OAuth/magic-link setups.
+   - For this repo's default email/password flow, verify Site URL first.
+5. **"Missing Supabase environment variables"**:
+   - Ensure `.env.local` exists and has `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+   - Restart `npm run dev` after changes.
+6. **"Failed to fetch" or auth/database requests failing locally**:
+   - Verify all three keys are set.
+   - Re-check Supabase project URL/key values from Settings → API.
+7. **Auth works but profiles/events fail**:
+   - Ensure both SQL files were executed:
+     - `src/lib/supabase/schema.sql`
+     - `src/lib/supabase/functions.sql`
+8. **Email confirmation link points to `/auth/callback` and 404s**:
+   - This repo does not include a callback route by default.
+   - Update your Supabase redirect configuration or implement a callback route before enabling callback-based auth flows.
 
 ### Useful SQL Queries
 

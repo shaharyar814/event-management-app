@@ -1,6 +1,6 @@
 # EventHub - Event Management Platform
 
-A modern, beautiful event management web application built with Next.js 14, TypeScript, and Tailwind CSS.
+A modern, beautiful event management web application built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## 🚀 Features
 
@@ -24,7 +24,7 @@ A modern, beautiful event management web application built with Next.js 14, Type
 
 ### 📱 Pages Implemented
 
-1. **Landing Page** (`/`) - Welcome screen with auto-redirect to dashboard
+1. **Root Route** (`/`) - Redirects to `/dashboard` (configured in `next.config.ts`)
 2. **Dashboard** (`/dashboard`) - Overview with stats, recent events, and quick actions
 3. **Events Listing** (`/events`) - Comprehensive event management with filters
 4. **Create Event** (`/events/create`) - Beautiful form with validation
@@ -32,7 +32,7 @@ A modern, beautiful event management web application built with Next.js 14, Type
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: Shadcn/ui + Radix UI
@@ -90,7 +90,7 @@ A modern, beautiful event management web application built with Next.js 14, Type
 
 ```bash
 git clone <your-repo-url>
-cd eventhub
+cd event-management-app
 npm install
 ```
 
@@ -98,12 +98,17 @@ npm install
 
 1. Create a new project at [supabase.com](https://supabase.com)
 2. Go to Settings → API and copy your credentials
-3. Create `.env.local` file:
+3. Create `.env.local` from the template:
+   ```bash
+   cp env.example .env.local
+   ```
+4. Replace placeholder values in `.env.local`:
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
    ```
+5. Restart the dev server whenever `NEXT_PUBLIC_*` values change.
 
 ### 3. Set Up Database
 
@@ -115,7 +120,8 @@ npm install
 
 1. In Supabase Dashboard → Authentication → Settings
 2. Set Site URL to `http://localhost:3000`
-3. Add redirect URL: `http://localhost:3000/auth/callback`
+3. Redirect URLs are optional for this app's current auth flow (email/password).  
+   Only add callback URLs if you introduce OAuth or magic-link flows.
 
 ### 5. Start Development Server
 
@@ -129,22 +135,79 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 
 📖 **Detailed Setup Guide**: See `SUPABASE_SETUP.md` for complete instructions.
 
+## 🩺 Local Development Troubleshooting
+
+### "Missing Supabase environment variables"
+
+The browser/client Supabase singleton throws at startup when either `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` is missing.  
+Fix:
+
+1. Confirm `.env.local` exists and has all required keys.
+2. Restart `npm run dev` after any env change.
+
+### Changed env values but app still behaves like old config
+
+`NEXT_PUBLIC_*` values are inlined at build/compile time. If the app still uses stale values:
+
+```bash
+rm -rf .next
+npm run dev
+```
+
+### Redirected to `/auth/login` unexpectedly
+
+Routes such as `/dashboard`, `/events`, `/analytics`, `/profile`, and `/settings` are protected by middleware and redirect unauthenticated users to `/auth/login`.
+
+### Supabase email links redirect to a missing callback page
+
+This repository currently has no `/auth/callback` route. Current auth UI uses `signInWithPassword` and `signUp` from `src/lib/auth/auth-context.tsx`, so callback routes are not required unless you add OAuth/magic-link auth.
+
+### Build succeeds but lint/type-check shows errors
+
+`npm run lint` and `npm run type-check` currently surface known pre-existing issues, while production builds still pass because `next.config.ts` sets:
+
+- `eslint.ignoreDuringBuilds: true`
+- `typescript.ignoreBuildErrors: true`
+
+## 🔐 Auth & Route Protection Workflow
+
+### What is implemented today
+
+- `src/lib/auth/auth-context.tsx`
+  - `signIn` uses `supabase.auth.signInWithPassword`
+  - `signUp` uses `supabase.auth.signUp` with user metadata
+  - auth state is tracked via `onAuthStateChange`
+- `src/middleware.ts`
+  - protects `/dashboard`, `/events`, `/analytics`, `/profile`, `/settings`
+  - redirects unauthenticated requests to `/auth/login`
+  - redirects authenticated users away from `/auth/*` to `/dashboard`
+
+### Practical implications
+
+- Email/password works without an auth callback route.
+- If you add OAuth or magic-link auth later, add an explicit callback route and update Supabase redirect URLs.
+
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── dashboard/         # Dashboard page
-│   ├── events/           # Events listing and creation
-│   ├── analytics/        # Analytics dashboard
-│   ├── globals.css       # Global styles and animations
-│   └── layout.tsx        # Root layout with theme provider
+├── app/                         # Next.js App Router pages
+│   ├── auth/                    # Login/register pages
+│   ├── dashboard/               # Dashboard page
+│   ├── events/                  # Events listing + create flows
+│   ├── analytics/               # Analytics page
+│   ├── globals.css
+│   └── layout.tsx               # Root providers (theme + auth)
 ├── components/
-│   ├── ui/               # Shadcn/ui components
-│   ├── layout/           # Layout components (header, sidebar)
-│   └── theme-provider.tsx # Theme switching logic
-└── lib/
-    └── utils.ts          # Utility functions
+│   ├── auth/                    # Auth loading UI
+│   ├── layout/                  # Header/sidebar/dashboard layout
+│   ├── theme-provider.tsx
+│   └── ui/                      # Shadcn/ui components
+├── lib/
+│   ├── auth/auth-context.tsx    # Client auth state + actions
+│   ├── services/                # Supabase-backed data services
+│   └── supabase/                # Supabase client/server + SQL schema
+└── middleware.ts                # Route protection + auth redirects
 ```
 
 ## 🎨 Design Highlights

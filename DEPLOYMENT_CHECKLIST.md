@@ -12,7 +12,7 @@ Use this checklist to ensure a smooth deployment to Vercel.
 - [ ] Row Level Security (RLS) enabled
 - [ ] Authentication policies configured
 - [ ] Site URL configured in Supabase Auth settings
-- [ ] Redirect URLs added for production domain
+- [ ] Redirect URLs configured only if using OAuth/magic-link callback flows
 
 ### Environment Variables Ready
 
@@ -23,8 +23,8 @@ Use this checklist to ensure a smooth deployment to Vercel.
 ### Code Quality Checks
 
 - [ ] `npm run build` - Build passes locally
-- [ ] `npm run type-check` - No TypeScript errors
-- [ ] `npm run lint` - No linting errors
+- [ ] `npm run type-check` - Reviewed (known pre-existing issues may appear)
+- [ ] `npm run lint` - Reviewed (known pre-existing issues may appear)
 - [ ] All components render without errors
 - [ ] Authentication flow works locally
 
@@ -41,7 +41,6 @@ Use this checklist to ensure a smooth deployment to Vercel.
 ### Deploy & Test
 
 - [ ] Initial deployment successful
-- [ ] Health check endpoint working (`/api/health`)
 - [ ] Application loads without errors
 - [ ] All routes accessible
 
@@ -94,6 +93,7 @@ Use this checklist to ensure a smooth deployment to Vercel.
 1. Verify Supabase URL and keys in Vercel
 2. Check Site URL in Supabase settings
 3. Verify redirect URLs are configured
+   - Only required for callback-based OAuth/magic-link auth
 4. Test in incognito/private browsing
 
 ### If Database Connection Fails
@@ -108,7 +108,6 @@ Use this checklist to ensure a smooth deployment to Vercel.
 1. Check Vercel function logs
 2. Verify all environment variables are set
 3. Check for runtime errors in Vercel dashboard
-4. Test health endpoint: `/api/health`
 
 ## 📊 Monitoring Setup
 
@@ -148,7 +147,6 @@ Your deployment is successful when:
 - ✅ Events can be created and viewed
 - ✅ All navigation works correctly
 - ✅ No console errors in production
-- ✅ Health check returns healthy status
 - ✅ Mobile and desktop views work properly
 
 ## 📞 Support Resources
@@ -161,6 +159,4 @@ Your deployment is successful when:
 ---
 
 **Deployment URL**: `https://your-project.vercel.app`
-**Health Check**: `https://your-project.vercel.app/api/health`
-
 **Status**: 🟢 Ready for Production
