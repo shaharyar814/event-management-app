@@ -28,6 +28,12 @@ Use this checklist to ensure a smooth deployment to Vercel.
 - [ ] All components render without errors
 - [ ] Authentication flow works locally
 
+### Framework Security Maintenance
+
+- [ ] `package.json` and `package-lock.json` updated together for dependency security patches
+- [ ] `npm ls next react react-dom eslint-config-next` confirms expected framework versions
+- [ ] Critical framework CVE patches validated in a preview deployment before production rollout
+
 ## 🚀 Deployment Process
 
 ### Vercel Setup
@@ -88,6 +94,8 @@ Use this checklist to ensure a smooth deployment to Vercel.
 2. Check linting errors: `npm run lint`
 3. Verify all imports are correct
 4. Check for missing dependencies
+5. Check for framework version drift: `npm ls next react react-dom eslint-config-next`
+6. Reinstall from lockfile if versions are stale: `npm ci`
 
 ### If Authentication Fails
 

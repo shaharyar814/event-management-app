@@ -133,6 +133,37 @@ The deployment includes:
 - **Environment Validation**: Required variables checked at build time
 - **Console Removal**: Console logs removed in production
 
+### Critical Framework CVE Response (Runbook)
+
+Use this runbook when a security advisory targets Next.js, React, or React Server Components.
+
+1. **Confirm current framework versions**
+   ```bash
+   npm ls next react react-dom eslint-config-next
+   ```
+2. **Apply patched framework/tooling versions**
+   ```bash
+   npm install next@latest eslint-config-next@latest
+   ```
+3. **Validate before deploy**
+   ```bash
+   npm run build
+   npm run lint
+   npm run type-check
+   ```
+4. **Deploy to preview first**
+   - Verify authentication (`/auth/login`, `/auth/register`)
+   - Verify event workflows (`/events`, `/events/create`)
+5. **Promote to production and monitor**
+   - Watch Vercel runtime logs for new server errors
+   - Re-check sign-in and event creation after rollout
+
+**Constraints**
+
+- Do not ship framework security upgrades without committing both `package.json` and `package-lock.json`
+- Keep framework tooling aligned (`next` and `eslint-config-next`) during routine maintenance
+- Avoid delaying production rollout after preview validation for critical CVE patches
+
 ## 📊 Performance Optimizations
 
 - **Image Optimization**: WebP/AVIF formats, Supabase storage support
@@ -203,6 +234,12 @@ The deployment includes:
    - Check Site URL in Supabase settings
    - Verify redirect URLs are configured
    - Test with different browsers/incognito
+
+5. **Security Patch Did Not Apply**:
+   - Confirm the committed versions in `package.json`
+   - Verify lockfile updates in `package-lock.json`
+   - Reinstall dependencies after pulling updates: `npm ci`
+   - Run `npm ls next react react-dom eslint-config-next` to confirm installed versions
 
 ### Debug Commands
 
