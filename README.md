@@ -49,6 +49,39 @@ A modern, beautiful event management web application built with Next.js 14, Type
 - **Collapsible Sidebar** with quick access links and badges
 - **Mobile-First Design** with hamburger menu for small screens
 
+### Theme System (Light/Dark)
+
+- **Provider at app root**: `src/app/layout.tsx` wraps all routes with `ThemeProvider` (`next-themes`) using `attribute="class"`, `defaultTheme="system"`, `enableSystem`, and `disableTransitionOnChange`.
+- **Reusable toggle component**: `src/components/theme-toggle.tsx` centralizes light/dark switch behavior and accessibility label handling.
+- **Theme switch entry points**:
+  - `src/components/layout/header.tsx` (authenticated app shell)
+  - `src/app/page.tsx` (landing page)
+  - `src/app/auth/layout.tsx` (auth pages)
+
+#### Adding a theme toggle to a new page
+
+Use the shared component instead of duplicating `useTheme` logic:
+
+```tsx
+import { ThemeToggle } from "@/components/theme-toggle";
+
+export default function ExamplePage() {
+  return (
+    <div className="relative min-h-screen">
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+      {/* page content */}
+    </div>
+  );
+}
+```
+
+Constraints:
+
+- `ThemeToggle` is a client component (`"use client"`), so it must render in a client boundary.
+- For corner placement, set the parent container to `relative` so `absolute` positioning anchors correctly.
+
 ### Dashboard
 
 - **Statistics Cards** with trend indicators
@@ -129,12 +162,21 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 
 📖 **Detailed Setup Guide**: See `SUPABASE_SETUP.md` for complete instructions.
 
+## 🧯 Troubleshooting
+
+### Theme toggle does not update the UI
+
+- Verify `ThemeProvider` remains configured in `src/app/layout.tsx`.
+- Import and use the shared `ThemeToggle` from `@/components/theme-toggle`.
+- If the toggle appears misplaced, ensure the nearest wrapper uses `relative` before applying `absolute` positioning.
+
 ## 📁 Project Structure
 
 ```
 src/
 ├── app/                    # Next.js App Router pages
 │   ├── dashboard/         # Dashboard page
+│   ├── auth/              # Auth layout and pages
 │   ├── events/           # Events listing and creation
 │   ├── analytics/        # Analytics dashboard
 │   ├── globals.css       # Global styles and animations
@@ -142,7 +184,8 @@ src/
 ├── components/
 │   ├── ui/               # Shadcn/ui components
 │   ├── layout/           # Layout components (header, sidebar)
-│   └── theme-provider.tsx # Theme switching logic
+│   ├── theme-provider.tsx # Theme context provider
+│   └── theme-toggle.tsx   # Shared light/dark toggle
 └── lib/
     └── utils.ts          # Utility functions
 ```
