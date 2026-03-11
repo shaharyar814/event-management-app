@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useAuth } from "@/lib/auth/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,16 +18,15 @@ import {
     Bell,
     Calendar,
     Menu,
-    Moon,
     Plus,
     Search,
     Settings,
-    Sun,
     User,
     LogOut,
     Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { toast } from "sonner";
 
 interface HeaderProps {
@@ -36,7 +34,6 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-    const { setTheme, theme } = useTheme();
     const { user, profile, signOut } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -114,16 +111,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                             </Badge>
                         </Button>
 
-                        {/* Theme Toggle */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                        >
-                            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                            <span className="sr-only">Toggle theme</span>
-                        </Button>
+                        <ThemeToggle />
 
                         {/* User Menu */}
                         <DropdownMenu>
